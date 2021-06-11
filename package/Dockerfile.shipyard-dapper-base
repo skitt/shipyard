@@ -14,6 +14,7 @@ ENV HOST_ARCH=${DAPPER_HOST_ARCH} ARCH=${DAPPER_HOST_ARCH} PATH=/go/bin:/usr/loc
 # Component        | Usage
 # -------------------------------------------------------------
 # curl             | download other tools
+# diffutils        | diff (for golangci-lint)
 # findutils        | make unit (find unit test dirs)
 # gcc              | needed by `go test -race` (https://github.com/golang/go/issues/27089)
 # ginkgo           | tests
@@ -37,12 +38,12 @@ ENV HOST_ARCH=${DAPPER_HOST_ARCH} ARCH=${DAPPER_HOST_ARCH} PATH=/go/bin:/usr/loc
 
 # This layer's versioning is handled by dnf, and isn't expected to be rebuilt much except in CI
 RUN dnf -y install --nodocs --setopt=install_weak_deps=False \
-                   gcc git-core curl moby-engine make golang kubernetes-client \
-                   findutils upx jq ShellCheck npm gitlint yamllint \
+                   gcc git-core curl podman-remote make golang kubernetes-client \
+                   diffutils findutils upx jq ShellCheck npm gitlint yamllint \
                    qemu-user-static python3-pip && \
     npm install -g markdownlint-cli && \
     pip install j2cli[yaml] --user && \
-    rpm -e --nodeps containerd npm python3-pip && \
+    rpm -e --nodeps npm python3-pip && \
     rpm -qa "selinux*" | xargs -r rpm -e --nodeps && \
     dnf -y clean all && \
     rm -f /usr/bin/{dockerd,lto-dump} \
@@ -65,7 +66,8 @@ RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/i
     curl -L "https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-${ARCH}" -o ~/.docker/cli-plugins/docker-buildx && \
     chmod 755 ~/.docker/cli-plugins/docker-buildx && \
     find /go/bin ~/.docker/cli-plugins -type f -executable -newercc /proc -exec strip {} + && \
-    find /go/bin ~/.docker/cli-plugins -type f -executable -newercc /proc \( -execdir upx ${UPX_LEVEL} {} \; -o -true \)
+    find /go/bin ~/.docker/cli-plugins -type f -executable -newercc /proc \( -execdir upx ${UPX_LEVEL} {} \; -o -true \) && \
+    mkdir -p /go/src && chmod -R a+rwX /go
 
 # Copy kubecfg to always run on the shell
 COPY scripts/shared/lib/kubecfg /etc/profile.d/kubecfg.sh
