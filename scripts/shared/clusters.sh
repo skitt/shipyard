@@ -57,7 +57,7 @@ function generate_cluster_yaml() {
     local nodes
     for node in ${cluster_nodes[${cluster}]}; do nodes="${nodes}"$'\n'"- role: $node"; done
 
-    render_template ${RESOURCES_DIR}/kind-cluster-config.yaml > ${RESOURCES_DIR}/${cluster}-config.yaml
+    render_template ${RESOURCES_DIR}/kind-cluster-config.yaml > ${OUTPUT_DIR}/${cluster}-config.yaml
 }
 
 function kind_fixup_config() {
@@ -94,8 +94,8 @@ function create_kind_cluster() {
     fi
 
     kind version
-    cat ${RESOURCES_DIR}/${cluster}-config.yaml
-    kind create cluster $image_flag --name=${cluster} --config=${RESOURCES_DIR}/${cluster}-config.yaml
+    cat ${OUTPUT_DIR}/${cluster}-config.yaml
+    KIND_EXPERIMENTAL_PROVIDER=podman kind create cluster $image_flag --name=${cluster} --config=${OUTPUT_DIR}/${cluster}-config.yaml
     kind_fixup_config
 
     ( deploy_cluster_capabilities; ) &
@@ -135,9 +135,9 @@ function deploy_kind_ovn(){
 
     export OVN_IMAGE="localhost:5000/ovn-daemonset-f:latest"
     export REGISTRY_IP="kind-registry"
-    docker pull "${OVN_SRC_IMAGE}"
-    docker tag "${OVN_SRC_IMAGE}" "${OVN_IMAGE}"
-    docker push "${OVN_IMAGE}"
+    docker --remote --url=unix://var/run/docker.sock pull "${OVN_SRC_IMAGE}"
+    docker --remote --url=unix://var/run/docker.sock tag "${OVN_SRC_IMAGE}" "${OVN_IMAGE}"
+    docker --remote --url=unix://var/run/docker.sock push "${OVN_IMAGE}"
     sed -i 's/^kind load/#kind load/g' $OVN_DIR/contrib/kind.sh
 
     (  cd ${OVN_DIR}/contrib; ./kind.sh; ) &
@@ -162,12 +162,12 @@ function run_local_registry() {
     else
         echo "Deploying local registry $KIND_REGISTRY to serve images centrally."
         local volume_flag
-        if [[ $registry_inmemory = true ]]; then
-            volume_flag="-v /dev/shm/${KIND_REGISTRY}:/var/lib/registry"
-            selinuxenabled && volume_flag="${volume_flag}:z" 2>/dev/null
-        fi
-        docker run -d $volume_flag -p 127.0.0.1:5000:5000 --restart=always --name $KIND_REGISTRY registry:2
-        docker network connect kind $KIND_REGISTRY || true
+#        if [[ $registry_inmemory = true ]]; then
+#            volume_flag="-v /dev/shm/${KIND_REGISTRY}:/var/lib/registry"
+#            selinuxenabled && volume_flag="${volume_flag}:z" 2>/dev/null
+#        fi
+        docker --remote --url=unix://var/run/docker.sock run -d $volume_flag -p 127.0.0.1:5000:5000 --restart=always --name $KIND_REGISTRY registry:2
+        docker --remote --url=unix://var/run/docker.sock network connect kind $KIND_REGISTRY || true
     fi
 }
 

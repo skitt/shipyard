@@ -8,5 +8,11 @@ ENV DAPPER_OUTPUT=${DAPPER_SOURCE}/output
 
 WORKDIR ${DAPPER_SOURCE}
 
+RUN echo '#!/bin/sh' > /usr/local/bin/docker && \
+    echo 'podman-remote --url=unix:///var/run/docker.sock "$@"' >> /usr/local/bin/docker && \
+    echo '#!/bin/sh' > /usr/local/bin/podman && \
+    echo 'podman-remote --url=unix:///var/run/docker.sock "$@"' >> /usr/local/bin/podman && \
+    chmod 755 /usr/local/bin/docker /usr/local/bin/podman
+
 ENTRYPOINT ["/opt/shipyard/scripts/entry"]
 CMD ["sh"]
