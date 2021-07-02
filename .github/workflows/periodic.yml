@@ -4,6 +4,7 @@ name: Periodic
 on:
   schedule:
     - cron: "0 0 * * 0"
+  pull_request:
 
 jobs:
   markdown-link-check-periodic:
@@ -29,7 +30,7 @@ jobs:
 
   go-mod-outdated-periodic:
     name: Outdated Dependencies
-    if: github.repository_owner == 'submariner-io'
+#    if: github.repository_owner == 'submariner-io'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
