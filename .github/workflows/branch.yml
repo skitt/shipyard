@@ -7,7 +7,7 @@ on:
 jobs:
   target_branch:
     name: PR targets branch
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Check that the PR targets devel
         if: ${{ github.base_ref != 'devel' }}

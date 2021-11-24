@@ -10,7 +10,7 @@ on:
 jobs:
   updated:
     name: Up-to-date
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Check out the repository
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f

@@ -7,7 +7,7 @@ on:
 jobs:
   apply-suggestions-commits:
     name: 'No "Apply suggestions from code review" Commits'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Get PR commits
         id: 'get-pr-commits'
@@ -25,7 +25,7 @@ jobs:
 
   commit-size:
     name: Commit Size
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Check out the repository
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
@@ -36,7 +36,7 @@ jobs:
 
   gitlint:
     name: Commit Message(s)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Check out the repository
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
@@ -47,7 +47,7 @@ jobs:
 
   golangci-lint:
     name: Go
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Check out the repository
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
@@ -56,7 +56,7 @@ jobs:
 
   headers:
     name: License Headers
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Check out the repository
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
@@ -66,7 +66,7 @@ jobs:
 
   markdown-link-check:
     name: Markdown Links (modified files)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Check out the repository
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
@@ -80,7 +80,7 @@ jobs:
 
   markdownlint:
     name: Markdown
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Check out the repository
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
@@ -89,7 +89,7 @@ jobs:
 
   packagedoc-lint:
     name: Package Documentation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Check out the repository
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
@@ -98,7 +98,7 @@ jobs:
 
   shellcheck:
     name: Shell
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Check out the repository
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f
@@ -107,7 +107,7 @@ jobs:
 
   yaml-lint:
     name: YAML
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Check out the repository
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f

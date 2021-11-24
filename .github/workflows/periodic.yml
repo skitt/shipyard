@@ -9,7 +9,7 @@ jobs:
   markdown-link-check-periodic:
     name: Markdown Links (all files)
     if: github.repository_owner == 'submariner-io'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - name: Check out the repository
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f

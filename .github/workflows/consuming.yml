@@ -9,7 +9,7 @@ jobs:
   e2e:
     name: E2E
     timeout-minutes: 30
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     if: |
       ( github.event.action == 'labeled' && github.event.label.name == 'e2e-projects' )
       || ( github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'e2e-projects') )
@@ -75,7 +75,7 @@ jobs:
   lint-consuming:
     name: Lint
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     if: |
       ( github.event.action == 'labeled' && github.event.label.name == 'lint-projects' )
       || ( github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'lint-projects') )
@@ -110,7 +110,7 @@ jobs:
   unit-consuming:
     name: Unit Tests
     timeout-minutes: 15
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     if: |
       ( github.event.action == 'labeled' && github.event.label.name == 'unit-projects' )
       || ( github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'unit-projects') )
