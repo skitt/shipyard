@@ -25,7 +25,7 @@ runs:
         IMAGES_ARGS: --nocache ${{ inputs.image_args }}
       run: |
         echo "::group::Build new images"
-        make images multiarch-images
+        make images multiarch-images IMAGES_ARGS="--repo quay.io/skitt"
         echo "::endgroup::"
     - name: Release newly build images
       shell: bash
@@ -33,4 +33,4 @@ runs:
         QUAY_USERNAME: ${{ inputs.username }}
         QUAY_PASSWORD: ${{ inputs.password }}
       # Pass RELEASE_ARGS on the call, since GITHUB_REF set in the `env` directive doesn't get properly expanded
-      run: make release-images RELEASE_ARGS="--tag '${GITHUB_REF##*/}'"
+      run: make release-images RELEASE_ARGS="--tag '${GITHUB_REF##*/}' --repo quay.io/skitt"
