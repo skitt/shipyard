@@ -1,4 +1,4 @@
-FROM alpine
+FROM alpine:3.18.3
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ RUN cd netperf-netperf-2.7.0 && ./configure CFLAGS=-fcommon \
     && make && make install
 
 
-FROM alpine
+FROM alpine:3.18.3
 
 WORKDIR /app
 
