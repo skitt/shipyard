@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 
-set -em
+set -emx
+
+printf "SCRIPTS_DIR=%s\n" "$SCRIPTS_DIR"
+printf "SHIPYARD_DIR=%s\n" "$SHIPYARD_DIR"
+
+diff -urN "$SCRIPTS_DIR" scripts/shared ||:
+for file in "$SHIPYARD_DIR"/*; do
+  if [ -f "$file" ]; then
+    diff "$file" "${file##*/}" ||:
+  fi
+done
 
 source "${SCRIPTS_DIR}/lib/utils"
 print_env CABLE_DRIVER DEPLOYTOOL GLOBALNET IMAGE_TAG LIGHTHOUSE PARALLEL PLUGIN PRELOAD_IMAGES SETTINGS TIMEOUT
