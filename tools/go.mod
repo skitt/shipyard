@@ -5,7 +5,7 @@ go 1.25.0
 require (
 	github.com/golangci/golangci-lint/v2 v2.11.3
 	github.com/psampaz/go-mod-outdated v0.9.0
-	sigs.k8s.io/kind v0.30.0
+	sigs.k8s.io/kind v0.31.0
 )
 
 require (
