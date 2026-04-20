@@ -114,7 +114,7 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - name: Run govulncheck (producing a text report and failing the build if necessary)
-        run: make BUILD_UPX=false govulncheck
+        run: make IMAGE_UPX=false govulncheck
 
   yaml-lint:
     name: YAML
