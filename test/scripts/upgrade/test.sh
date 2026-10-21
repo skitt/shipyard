@@ -13,13 +13,13 @@ export VERSION_CHECK_TIMEOUT=0
 export SUBCTL_IMAGE_VERSION=
 export PATH="$fixture/bin:$PATH"
 
-cat > "$fixture/bin/curl" <<'EOF'
+cat > "$fixture/bin/git" <<'EOF'
 #!/usr/bin/env bash
 set -e
+[ "$1" = "ls-remote" ] || exit 0
+[ "$2" = "--tags" ] || exit 0
 [[ ! -f "$FIXTURE/api-error" ]] || exit 22
-page=${!#}
-page=${page##*page=}
-cat "$FIXTURE/page-$page.json"
+cat "$FIXTURE/tags"
 EOF
 cat > "$fixture/bin/kubectl" <<'EOF'
 #!/usr/bin/env bash
@@ -54,17 +54,12 @@ expect_failure() {
     fi
 }
 
-cat > "$fixture/page-1.json" <<'EOF'
-[
-  {"tag_name":"v0.24.2","draft":false,"prerelease":false},
-  {"tag_name":"v0.22.9","draft":false,"prerelease":false},
-  {"tag_name":"v0.22.10","draft":false,"prerelease":false},
-  {"tag_name":"v0.22.11","draft":true,"prerelease":false},
-  {"tag_name":"v0.22.12","draft":false,"prerelease":true},
-  {"tag_name":"v0.22.13-rc1","draft":false,"prerelease":false},
-  {"tag_name":"v0.220.1","draft":true,"prerelease":false},
-  {"tag_name":"subctl-release-0.22","draft":false,"prerelease":false}
-]
+cat > "$fixture/tags" <<'EOF'
+foo refs/tags/v0.24.2
+foo refs/tags/v0.22.9
+foo refs/tags/v0.22.10
+foo refs/tags/v0.22.13-rc1
+foo refs/tags/subctl-release-0.22
 EOF
 expect_baseline v0.22.10 release-0.22
 expect_baseline v0.24.2 devel
@@ -77,30 +72,19 @@ expect_failure "$scripts/resolve-upgrade-baseline.sh" release-0.22 latest
 expect_failure "$scripts/resolve-upgrade-baseline.sh" release-0.22 v0.22.2-rc1
 
 # A similar minor prefix must not match; do not fall back to a newer stream.
-echo '[{"tag_name":"v0.220.1","draft":false,"prerelease":false}]' > "$fixture/page-1.json"
+echo 'foo refs/tags/v0.220.1' > "$fixture/tags"
 expect_failure "$scripts/resolve-upgrade-baseline.sh" release-0.22
-
-# Follow full pages; a maintenance baseline may be on a later page.
-jq -n '[range(100) | {tag_name:"v0.24.2",draft:false,prerelease:false}]' > "$fixture/page-1.json"
-echo '[{"tag_name":"v0.22.2","draft":false,"prerelease":false}]' > "$fixture/page-2.json"
-expect_baseline v0.22.2 release-0.22
 
 touch "$fixture/api-error"
 expect_failure "$scripts/resolve-upgrade-baseline.sh" release-0.22
 # An exact override must work without network access.
 expect_baseline v0.22.2 release-0.22 v0.22.2
 rm "$fixture/api-error"
-echo '{"message":"API error"}' > "$fixture/page-1.json"
-expect_failure "$scripts/resolve-upgrade-baseline.sh" release-0.22
-echo 'invalid JSON' > "$fixture/page-1.json"
-expect_failure "$scripts/resolve-upgrade-baseline.sh" release-0.22
-echo '[{"tag_name":"v0.22.2","draft":false}]' > "$fixture/page-1.json"
-expect_failure "$scripts/resolve-upgrade-baseline.sh" release-0.22
-echo '[]' > "$fixture/page-1.json"
+echo '' > "$fixture/tags"
 expect_failure "$scripts/resolve-upgrade-baseline.sh" devel
 
 # Exercise the actual baseline recipe: a target-phase image setting must not leak.
-echo '[{"tag_name":"v0.22.2","draft":false,"prerelease":false}]' > "$fixture/page-1.json"
+echo 'foo refs/tags/v0.22.2' > "$fixture/tags"
 cat > "$fixture/bin/recursive-make" <<'EOF'
 #!/usr/bin/env bash
 printf '%s\n' "$@" > "$FIXTURE/baseline-make-args"

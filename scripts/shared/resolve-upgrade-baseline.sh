@@ -26,23 +26,13 @@ elif [[ "$branch" != devel ]]; then
     fail "Unsupported base branch '$branch'; set UPGRADE_BASELINE_VERSION explicitly"
 fi
 
-headers=(-H 'Accept: application/vnd.github+json')
-token=${GH_TOKEN:-${GITHUB_TOKEN:-}}
-[[ -z "$token" ]] || headers+=(-H "Authorization: Bearer $token")
-
-tags=
-page=1
-while :; do
-    releases=$(curl --fail --silent --show-error --location --retry 3 "${headers[@]}" \
-        "https://api.github.com/repos/submariner-io/releases/releases?per_page=100&page=$page")
-    jq -e 'type == "array" and all(.[];
-        (.tag_name | type == "string") and
-        (.draft | type == "boolean") and (.prerelease | type == "boolean"))' \
-        <<< "$releases" > /dev/null || fail "Invalid releases response on page $page"
-    tags+="$(jq -r '.[] | select(.draft == false and .prerelease == false) | .tag_name' <<< "$releases")"$'\n'
-    [[ $(jq 'length' <<< "$releases") -eq 100 ]] || break
-    page=$((page + 1))
-done
+tmpdir=$(mktemp -d 2>/dev/null)
+trap 'rm -rf "$tmpdir"' EXIT
+pushd "$tmpdir" >/dev/null
+git init >/dev/null
+git remote add origin https://github.com/submariner-io/releases.git
+tags=$(git ls-remote --tags origin | awk -F/ '{print $NF}')
+popd >/dev/null
 
 # Compare version components numerically, independently of publication order.
 versions=$(jq -Rn '[inputs | select(test("^v(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$")) |
